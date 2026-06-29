@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Data Analyst</title>
+    <link rel = "stylesheet" href ="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo-section">
+                <h2>CoreAnalyst<span>.ai</span></h2>
+            </div>
+
+            <div class="upload-box">
+                <label for="file-upload" class="custom-upload-btn">
+                    <span>Drop your dataset here</span>
+                    <small>Supports CSV, XLSX, JSON</small>
+                </label>
+                <input type="file" id="file-upload" accept=".csv, .xlsx, .xls, .json" style="display:none;">
+            </div>
+
+            <div class="metrics-panel" id="metricsPanel">
+                <h3>Dataset Health Profile</h3>
+                <div class="metric-card fade-in">
+                    <span class="metric-label">Dimensions</span>
+                    <span class="metric-value" id="metaShape">- × -</span>
+                </div>
+                <div class="metric-card fade-in">
+                    <span class="metric-label">Duplicate Rows</span>
+                    <span class="metric-value badge-alert" id="metaDuplicates">0</span>
+                </div>
+                <div class="metric-card fade-in">
+                    <span class="metric-label">Null Cells</span>
+                    <span class="metric-value badge-warning" id="metaNulls">0</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="output-window" id="outputWindow">
+                <div class="system-message fade-in">
+                    <p>Welcome! Upload a file on the left to initialize the Coder-Critic environment loop.</p>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <input type="text" id="userQuery" placeholder="Ask your agent to clean data, extract statistics, or generate charts..." disabled>
+                <button id="sendBtn" disabled>Run Query</button>
+            </div>
+        </main>
+    </div>
+    <script>
+        const fileUpload = document.getElementById('file-upload');
+        const userQuery = document.getElementById('userQuery');
+        const sendBtn = document.getElementById('sendBtn');
+        const outputWindow = document.getElementById('outputWindow');
+
+        // Helper to update the dashboard's left metrics panel panel dynamically
+        function updateMetricsPanel(metrics) {
+            document.getElementById('metricsPanel').style.display = 'block';
+            document.getElementById('metaShape').innerText = `${metrics.total_rows} × ${metrics.total_columns}`;
+            document.getElementById('metaDuplicates').innerText = metrics.duplicate_count;
+            document.getElementById('metaNulls').innerText = metrics.total_nulls;
+        }
+
+        // Capture File Drop/Upload
+        fileUpload.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            outputWindow.innerHTML += `<div class="system-message fade-in"><p>⏳ Processing and profiling your dataset...</p></div>`;
+
+            const response = await fetch('/upload', { method: 'POST', body: formData });
+            const data = await response.json();
+
+            if (data.status === 'Success') {
+                updateMetricsPanel(data.metrics);
+                userQuery.disabled = false;
+                sendBtn.disabled = false;
+                userQuery.placeholder = "Ask something...";
+                outputWindow.innerHTML += `<div class="system-message fade-in" style="border-color:var(--apricot-cream)"><p>✅ Environment Ready! Dataset structure parsed successfully.</p></div>`;
+            } else {
+                outputWindow.innerHTML += `<div class="system-message fade-in" style="border-color:var(--oxblood)"><p>❌ Error: {data.message}</p></div>`;
+            }
+            outputWindow.scrollTop = outputWindow.scrollHeight;
+        });
+
+        // Capture Query Submissions
+        sendBtn.addEventListener('click', async () => {
+            const query = userQuery.value.trim();
+            if (!query) return;
+
+            outputWindow.innerHTML += `<div class="user-chat-bubble fade-in" style="text-align:right; margin-bottom:15px; color:var(--apricot-cream)"><p><strong>You:</strong> ${query}</p></div>`;
+            userQuery.value = '';
+
+            const formData = new URLSearchParams();
+            formData.append('query', query);
+
+            outputWindow.innerHTML += `<div class="system-message fade-in"><p>🤖 Thought Process: Thinking and validating execution path...</p></div>`;
+            outputWindow.scrollTop = outputWindow.scrollHeight;
+
+            const response = await fetch('/analyze', { method: 'POST', body: formData });
+            const data = await response.json();
+
+            if (data.status === 'Success') {
+                // Update side panel values instantly if modifications occurred
+                updateMetricsPanel(data.metrics);
+
+                // Generate a unique selector target ID for the graph canvas
+                const chartDivId = `chart-${Date.now()}`;
+                const terminalConsoleOutput = data.output_text.trim() ? data.output_text : "Executed cleanly (No text printed).";
+
+                outputWindow.innerHTML += `
+                    <div class="system-message fade-in" style="border-left: 4px solid var(--apricot-cream)">
+                        <p><strong>Agent Response:</strong> Query executed cleanly in ${data.iterations} model iterations.</p>
+
+                        <small style="color:#aaa;">Generated Sandbox Payload:</small>
+                        <pre style="background:#2a2a35; padding:10px; border-radius:4px; color:#fff; overflow-x:auto; font-family: monospace;">${data.code_run}</pre>
+
+                        <small style="color:#aaa;">Terminal Console Output Prints:</small>
+                        <pre style="background:#1e1e24; padding:10px; border-radius:4px; color:#7fdbca; overflow-x:auto; font-family: monospace;">${terminalConsoleOutput}</pre>
+
+                        ${data.has_chart ? `<div id="${chartDivId}" style="margin-top:15px; width:100%;"></div>` : ''}
+                    </div>`;
+
+                // If a Plotly visual string config is passed down, draw it client-side instantly
+                if (data.has_chart) {
+                    setTimeout(() => {
+                        const chartSpec = JSON.parse(data.chart_data);
+                        Plotly.newPlot(chartDivId, chartSpec.data, chartSpec.layout);
+                    }, 50);
+                }
+            } else {
+                outputWindow.innerHTML += `<div class="system-message fade-in" style="border-color:var(--oxblood)"><p>❌ Error: ${data.message}</p></div>`;
+            }
+            outputWindow.scrollTop = outputWindow.scrollHeight;
+        });
+    </script>
+</body>
+</html>

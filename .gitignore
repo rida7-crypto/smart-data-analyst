@@ -1,0 +1,16 @@
+# Secret environment variables
+.env
+
+# Python virtual environment folder
+.venv/
+venv/
+
+# PyCharm configuration files
+.idea/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/

@@ -1,0 +1,190 @@
+/* Color Palette Variables */
+:root {
+    --shadow-grey: #1e1e24;
+    --oxblood: #92140c;
+    --floral-white: #fff8f0;
+    --apricot-cream: #ffcf99;
+    --space-indigo: #111d4a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--shadow-grey);
+    color: var(--floral-white);
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 320px;
+    background-color: var(--space-indigo);
+    border-right: 2px solid var(--oxblood);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.logo-section h2 {
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+}
+
+.logo-section span {
+    color: var(--apricot-cream);
+}
+
+.upload-box {
+    border: 2px dashed var(--apricot-cream);
+    border-radius: 8px;
+    padding: 30px 15px;
+    text-align: center;
+    cursor: pointer;
+    background-color: rgba(30, 30, 36, 0.4);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.upload-box:hover {
+    transform: scale(1.02);
+    border-color: var(--floral-white);
+}
+
+.custom-upload-btn span {
+    display: block;
+    color: var(--floral-white);
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.custom-upload-btn small {
+    color: var(--apricot-cream);
+}
+
+/* Metadata Profile Cards */
+.metrics-panel h3 {
+    font-size: 1rem;
+    color: var(--apricot-cream);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.metric-card {
+    background-color: var(--shadow-grey);
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid var(--oxblood);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.metric-label {
+    font-size: 0.9rem;
+    color: #b0b5c6;
+}
+
+.metric-value {
+    font-weight: 700;
+    color: var(--floral-white);
+}
+
+/* Main Workspace UI */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--shadow-grey);
+}
+
+.output-window {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.system-message {
+    background-color: rgba(17, 29, 74, 0.5);
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 207, 153, 0.2);
+    max-width: 80%;
+}
+
+/* Chat Input Bar */
+.input-container {
+    padding: 25px;
+    background-color: rgba(17, 29, 74, 0.3);
+    border-top: 1px solid rgba(146, 20, 12, 0.3);
+    display: flex;
+    gap: 15px;
+}
+
+.input-container input {
+    flex: 1;
+    background-color: #2a2a35;
+    border: 1px solid var(--space-indigo);
+    padding: 14px 20px;
+    border-radius: 6px;
+    color: var(--floral-white);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.input-container input:focus {
+    border-color: var(--apricot-cream);
+}
+
+.input-container button {
+    background-color: var(--oxblood);
+    color: var(--floral-white);
+    border: none;
+    padding: 0 30px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.input-container button:hover:not(:disabled) {
+    background-color: #b3190f;
+    transform: translateY(-1px);
+}
+
+.input-container button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Sleek UI Micro-Animation */
+.fade-in {
+    animation: slideUpFade 0.4s ease forwards;
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
