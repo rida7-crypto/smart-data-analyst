@@ -155,10 +155,9 @@ def ask_llama_to_generate_code(user_query, df, quality_report):
 def generate_and_verify_pipeline(user_query, df, quality_report):
     attempts = 0
     max_attempts = 3
-    feedback_string = None  # Start clean without pre-baked feedback strings
+    feedback_string = None
 
     while attempts < max_attempts:
-        # Build a fresh, clean query providing only the LATEST context/criticism
         if feedback_string:
             active_query = (
                 f"User Request: {user_query}\n\n"
@@ -187,10 +186,8 @@ def generate_and_verify_pipeline(user_query, df, quality_report):
         "iterations": max_attempts
     }
 
-# ... (Keep Data_Cleaning, Importing_Data, critic_validate_code, and generate_and_verify_pipeline completely the same)
 
 def execute_generated_code(code_string, df):
-    # --- Air-tight Code Block Stripping Logic ---
     cleaned = re.sub(r'^```[a-zA-Z]*\s*\n', '', code_string, flags=re.MULTILINE | re.IGNORECASE)
     cleaned = re.sub(r'\n```\s*$', '', cleaned, flags=re.MULTILINE)
 
@@ -199,7 +196,6 @@ def execute_generated_code(code_string, df):
         lines.pop(0)
 
     clean_code = '\n'.join(lines).strip()
-    # ---------------------------------------------
 
     execution_context = {
         "df": df,
@@ -209,16 +205,13 @@ def execute_generated_code(code_string, df):
         "plt": plt
     }
 
-    # Intercept standard output streams to log print statement results
     old_stdout = sys.stdout
     redirected_output = io.StringIO()
     sys.stdout = redirected_output
 
     try:
-        # Run the fully sanitized code string safely in isolation
         exec(clean_code, {}, execution_context)
 
-        # Restore normal stdout stream tracking
         sys.stdout = old_stdout
         captured_text = redirected_output.getvalue()
 

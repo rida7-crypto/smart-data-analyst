@@ -1,4 +1,3 @@
-/* Consolidated 4-Color Palette Variables */
 :root {
     --shadow-grey: #0e0004;
     --oxblood: #000000;
@@ -14,7 +13,7 @@
 }
 
 body {
-    background-color: var(--oxblood); /* Set baseline to black to break up the pink */
+    background-color: var(--oxblood);
     color: var(--pure-white);
     height: 100vh;
     overflow: hidden;
@@ -25,7 +24,6 @@ body {
     height: 100vh;
 }
 
-/* Sidebar Layout */
 .sidebar {
     width: 320px;
     background-color: var(--space-indigo);
@@ -53,7 +51,7 @@ body {
     padding: 25px 15px;
     text-align: center;
     cursor: pointer;
-    background-color: var(--oxblood); /* Darkened container card */
+    background-color: var(--oxblood);
     transition: transform 0.2s ease, border-color 0.2s ease;
     flex-shrink: 0;
 }
@@ -95,7 +93,6 @@ body {
     border-radius: 4px;
 }
 
-/* Metadata Profile Cards */
 .metrics-panel h3, .columns-panel h3 {
     font-size: 0.9rem;
     color: var(--pure-white);
@@ -106,7 +103,7 @@ body {
 }
 
 .metric-card {
-    background-color: var(--oxblood); /* High contrast background against indigo */
+    background-color: var(--oxblood);
     padding: 15px;
     border-radius: 6px;
     border-left: 4px solid var(--shadow-grey);
@@ -174,7 +171,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: var(--shadow-grey); /* Keeps layout grounded */
+    background-color: var(--shadow-grey);
     min-width: 0;
 }
 
@@ -267,7 +264,6 @@ body {
     cursor: not-allowed;
 }
 
-/* Animations */
 .fade-in {
     animation: slideUpFade 0.4s ease forwards;
 }

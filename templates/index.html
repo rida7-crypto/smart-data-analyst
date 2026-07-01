@@ -135,7 +135,6 @@
             const chartDivId = `chart-${Date.now()}`;
             const terminalConsoleOutput = data.output_text.trim() ? data.output_text : "Executed cleanly (No text printed).";
 
-            // Rebuilt chat response layout with integrated code toggling controls
             outputWindow.innerHTML += `
                 <div class="system-message fade-in" style="border-left: 4px solid var(--pure-white); max-width: 90%;">
                     <p><strong>Agent Response:</strong> Query executed cleanly in ${data.iterations} model iterations.</p>
@@ -164,8 +163,8 @@
 
                     chartSpec.layout = chartSpec.layout || {};
                     chartSpec.layout.autosize = true;
-                    chartSpec.layout.width = null; // Unsets absolute widths
-                    chartSpec.layout.height = 400; // Forces regular spacing for back-to-back charts
+                    chartSpec.layout.width = null;
+                    chartSpec.layout.height = 400;
 
                     Plotly.newPlot(chartDivId, chartSpec.data, chartSpec.layout, {responsive: true});
                 }, 50);
