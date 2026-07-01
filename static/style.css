@@ -162,12 +162,20 @@ body {
     padding: 15px 0;
 }
 
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
 /* Main Workspace UI */
 .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     background-color: var(--shadow-grey); /* Keeps layout grounded */
+    min-width: 0;
 }
 
 .output-window {
@@ -177,6 +185,15 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+.chart-container-wrapper {
+    width: 100%;
+    background: var(--oxblood);
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 15px;
+    overflow: hidden;
 }
 
 .system-message {

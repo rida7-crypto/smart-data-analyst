@@ -35,6 +35,7 @@ def Data_Cleaning(df):
         "shape": df_shape,
         "total_rows": total_rows,
         "total_columns": total_cols,
+        "columns": list(df.columns),
         "duplicate_count": duplicate_count,
         "total_nulls": total_nulls,
         "nulls_per_column": nulls_per_column,
@@ -130,6 +131,8 @@ def ask_llama_to_generate_code(user_query, df, quality_report):
     3. If the user explicitly asks to clean data, fix duplicates, or handle missing values, dynamically write the code to clean the dataset and reassign it back to 'df'.
     4. If the user asks for a chart or visual diagram, you MUST save the final plotting object into a local variable explicitly named 'fig' (e.g., fig = px.bar(df, x='category', y='popularity')). Do NOT import streamlit, do NOT call st.plotly_chart, and do NOT use plt.show(). Return only the logic assigning the object to 'fig'.
     5. Return nothing but the raw executable Python code wrapped inside a markdown block (```python ... ```). Do not include conversational text, pleasantries, or explanations.
+    6. In case if the user asks for any subjective type answer only then in just a simple python print statement give a brief answer to the user's question. If required you can provide visual graphs or pythonic code to support your answer based exactly on the subjective question.
+    7. Your answer at all times must be in a python code.
     """
 
     messages = [

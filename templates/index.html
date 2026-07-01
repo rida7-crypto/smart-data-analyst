@@ -130,27 +130,46 @@
                 const data = await response.json();
 
                 if (data.status === 'Success') {
-                    updateMetricsPanel(data.metrics);
+            updateMetricsPanel(data.metrics);
 
-                    const chartDivId = `chart-${Date.now()}`;
-                    const terminalConsoleOutput = data.output_text.trim() ? data.output_text : "Executed cleanly (No text printed).";
+            const chartDivId = `chart-${Date.now()}`;
+            const terminalConsoleOutput = data.output_text.trim() ? data.output_text : "Executed cleanly (No text printed).";
 
-                    outputWindow.innerHTML += `
-                        <div class="system-message fade-in" style="border-left: 4px solid var(--pure-white)">
-                            <p><strong>Agent Response:</strong> Query executed cleanly in ${data.iterations} model iterations.</p>
-                            <small style="color:#aaa;">Generated Sandbox Payload:</small>
+            // Rebuilt chat response layout with integrated code toggling controls
+            outputWindow.innerHTML += `
+                <div class="system-message fade-in" style="border-left: 4px solid var(--pure-white); max-width: 90%;">
+                    <p><strong>Agent Response:</strong> Query executed cleanly in ${data.iterations} model iterations.</p>
+
+                    <div class="main-terminal-response" style="margin-top: 12px;">
+                        <small style="color:#aaa; font-weight:600;">Terminal Console Output:</small>
+                        <pre class="code-block-terminal" style="white-space: pre-wrap;">${terminalConsoleOutput}</pre>
+                    </div>
+
+                    <details style="margin-top: 15px; cursor: pointer;">
+                        <summary style="color: var(--pure-white); font-size: 0.85rem; opacity: 0.7; outline: none;">
+                            ▶ View Generated Sandbox Payload Code
+                        </summary>
+                        <div style="margin-top: 8px;">
                             <pre class="code-block-payload">${data.code_run}</pre>
-                            <small style="color:#aaa;">Terminal Console Output Prints:</small>
-                            <pre class="code-block-terminal">${terminalConsoleOutput}</pre>
-                            ${data.has_chart ? `<div id="${chartDivId}" style="margin-top:15px; width:100%;"></div>` : ''}
-                        </div>`;
+                        </div>
+                    </details>
 
-                    if (data.has_chart) {
-                        setTimeout(() => {
-                            const chartSpec = JSON.parse(data.chart_data);
-                            Plotly.newPlot(chartDivId, chartSpec.data, chartSpec.layout);
-                        }, 50);
-                    }
+                    ${data.has_chart ? `<div class="chart-container-wrapper"><div id="${chartDivId}"></div></div>` : ''}
+                </div>`;
+
+            // Enforce plot size scaling rules so they don't break windows or create fresh page states
+            if (data.has_chart) {
+                setTimeout(() => {
+                    const chartSpec = JSON.parse(data.chart_data);
+
+                    chartSpec.layout = chartSpec.layout || {};
+                    chartSpec.layout.autosize = true;
+                    chartSpec.layout.width = null; // Unsets absolute widths
+                    chartSpec.layout.height = 400; // Forces regular spacing for back-to-back charts
+
+                    Plotly.newPlot(chartDivId, chartSpec.data, chartSpec.layout, {responsive: true});
+                }, 50);
+            }
                 } else {
                     outputWindow.innerHTML += `<div class="system-message fade-in" style="border-color:var(--shadow-grey)"><p>Error: ${data.message}</p></div>`;
                 }
