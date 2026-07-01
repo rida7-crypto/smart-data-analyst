@@ -1,10 +1,9 @@
-/* Color Palette Variables */
+/* Consolidated 4-Color Palette Variables */
 :root {
-    --shadow-grey: #1e1e24;
-    --oxblood: #92140c;
-    --floral-white: #fff8f0;
-    --apricot-cream: #ffcf99;
-    --space-indigo: #111d4a;
+    --shadow-grey: #0e0004;
+    --oxblood: #000000;
+    --pure-white: #ffffff;
+    --space-indigo: #31081f;
 }
 
 * {
@@ -15,8 +14,8 @@
 }
 
 body {
-    background-color: var(--shadow-grey);
-    color: var(--floral-white);
+    background-color: var(--oxblood); /* Set baseline to black to break up the pink */
+    color: var(--pure-white);
     height: 100vh;
     overflow: hidden;
 }
@@ -26,15 +25,16 @@ body {
     height: 100vh;
 }
 
-/* Sidebar Styling */
+/* Sidebar Layout */
 .sidebar {
     width: 320px;
     background-color: var(--space-indigo);
-    border-right: 2px solid var(--oxblood);
+    border-right: 2px solid var(--shadow-grey);
     padding: 25px;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 25px;
+    height: 100%;
 }
 
 .logo-section h2 {
@@ -43,49 +43,73 @@ body {
 }
 
 .logo-section span {
-    color: var(--apricot-cream);
+    color: var(--pure-white);
+    opacity: 0.8;
 }
 
 .upload-box {
-    border: 2px dashed var(--apricot-cream);
+    border: 2px dashed var(--pure-white);
     border-radius: 8px;
-    padding: 30px 15px;
+    padding: 25px 15px;
     text-align: center;
     cursor: pointer;
-    background-color: rgba(30, 30, 36, 0.4);
+    background-color: var(--oxblood); /* Darkened container card */
     transition: transform 0.2s ease, border-color 0.2s ease;
+    flex-shrink: 0;
 }
 
 .upload-box:hover {
     transform: scale(1.02);
-    border-color: var(--floral-white);
+    border-color: var(--pure-white);
 }
 
 .custom-upload-btn span {
     display: block;
-    color: var(--floral-white);
+    color: var(--pure-white);
     font-weight: 600;
     margin-bottom: 5px;
 }
 
 .custom-upload-btn small {
-    color: var(--apricot-cream);
+    color: var(--pure-white);
+    opacity: 0.6;
+}
+
+/* Sidebar Scrollable Wrapper */
+.sidebar-scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding-right: 5px;
+}
+
+.sidebar-scrollable-content::-webkit-scrollbar,
+.columns-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar-scrollable-content::-webkit-scrollbar-thumb,
+.columns-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--shadow-grey);
+    border-radius: 4px;
 }
 
 /* Metadata Profile Cards */
-.metrics-panel h3 {
-    font-size: 1rem;
-    color: var(--apricot-cream);
-    margin-bottom: 15px;
+.metrics-panel h3, .columns-panel h3 {
+    font-size: 0.9rem;
+    color: var(--pure-white);
+    margin-bottom: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    opacity: 0.9;
 }
 
 .metric-card {
-    background-color: var(--shadow-grey);
+    background-color: var(--oxblood); /* High contrast background against indigo */
     padding: 15px;
     border-radius: 6px;
-    border-left: 4px solid var(--oxblood);
+    border-left: 4px solid var(--shadow-grey);
     margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
@@ -94,12 +118,48 @@ body {
 
 .metric-label {
     font-size: 0.9rem;
-    color: #b0b5c6;
+    color: var(--pure-white);
+    opacity: 0.6;
 }
 
 .metric-value {
     font-weight: 700;
-    color: var(--floral-white);
+    color: var(--pure-white);
+}
+
+/* Columns Section Style */
+.columns-scroll-container {
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background-color: var(--oxblood);
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--shadow-grey);
+}
+
+.column-pill {
+    background-color: var(--space-indigo);
+    padding: 8px 12px;
+    border-radius: 4px;
+    border-left: 3px solid var(--pure-white);
+}
+
+.column-name {
+    font-size: 0.85rem;
+    color: var(--pure-white);
+    font-family: monospace;
+}
+
+.no-columns-placeholder {
+    font-size: 0.85rem;
+    color: var(--pure-white);
+    opacity: 0.4;
+    font-style: italic;
+    text-align: center;
+    padding: 15px 0;
 }
 
 /* Main Workspace UI */
@@ -107,7 +167,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: var(--shadow-grey);
+    background-color: var(--shadow-grey); /* Keeps layout grounded */
 }
 
 .output-window {
@@ -120,42 +180,59 @@ body {
 }
 
 .system-message {
-    background-color: rgba(17, 29, 74, 0.5);
+    background-color: var(--space-indigo);
     padding: 15px 20px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 207, 153, 0.2);
+    border: 1px solid var(--oxblood);
     max-width: 80%;
 }
+
+.user-chat-bubble {
+    text-align: right;
+    margin-bottom: 15px;
+    color: var(--pure-white);
+}
+
+.code-block-payload, .code-block-terminal {
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: monospace;
+    margin-top: 6px;
+    display: block;
+}
+.code-block-payload { background: var(--oxblood); color: var(--pure-white); border: 1px solid var(--shadow-grey); }
+.code-block-terminal { background: var(--oxblood); color: var(--pure-white); border: 1px solid var(--space-indigo); }
 
 /* Chat Input Bar */
 .input-container {
     padding: 25px;
-    background-color: rgba(17, 29, 74, 0.3);
-    border-top: 1px solid rgba(146, 20, 12, 0.3);
+    background-color: var(--shadow-grey);
+    border-top: 2px solid var(--oxblood);
     display: flex;
     gap: 15px;
 }
 
 .input-container input {
     flex: 1;
-    background-color: #2a2a35;
-    border: 1px solid var(--space-indigo);
+    background-color: var(--space-indigo);
+    border: 1px solid var(--shadow-grey);
     padding: 14px 20px;
     border-radius: 6px;
-    color: var(--floral-white);
+    color: var(--pure-white);
     font-size: 1rem;
     outline: none;
     transition: border-color 0.2s ease;
 }
 
 .input-container input:focus {
-    border-color: var(--apricot-cream);
+    border-color: var(--pure-white);
 }
 
 .input-container button {
-    background-color: var(--oxblood);
-    color: var(--floral-white);
-    border: none;
+    background-color: var(--space-indigo);
+    color: var(--pure-white);
+    border: 1px solid var(--pure-white);
     padding: 0 30px;
     border-radius: 6px;
     font-weight: 600;
@@ -164,7 +241,7 @@ body {
 }
 
 .input-container button:hover:not(:disabled) {
-    background-color: #b3190f;
+    background-color: var(--shadow-grey);
     transform: translateY(-1px);
 }
 
@@ -173,18 +250,12 @@ body {
     cursor: not-allowed;
 }
 
-/* Sleek UI Micro-Animation */
+/* Animations */
 .fade-in {
     animation: slideUpFade 0.4s ease forwards;
 }
 
 @keyframes slideUpFade {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
