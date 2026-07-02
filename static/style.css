@@ -1,10 +1,40 @@
-:root {
-    --shadow-grey: #0e0004;
-    --oxblood: #000000;
-    --pure-white: #ffffff;
-    --space-indigo: #31081f;
+/* ==========================================================================
+   DESIGN TOKEN VARIABLES (THEME ENGINE)
+   ========================================================================== */
+
+/* 1. Default Light Mode System */
+:root[data-theme="light"] {
+    --main-bg: #f9f9fb;
+    --sidebar-bg: #f3ebf0;
+    --card-bg: #ffffff;
+    --border-subtle: #e4dae0;
+    --accent-plum: #51183c;
+    --text-primary: #1a1116;
+    --text-secondary: #625960;
+    --code-bg: #22141c;
+    --code-text: #f7f1f4;
+    --button-text: #ffffff;
+    --button-hover: #3d112d;
 }
 
+/* 2. Premium Refined Dark Mode System */
+:root[data-theme="dark"] {
+    --main-bg: #0d060a;
+    --sidebar-bg: #180913;
+    --card-bg: #1d0f18;
+    --border-subtle: #2d1625;
+    --accent-plum: #b83280;
+    --text-primary: #f7f1f5;
+    --text-secondary: #9c8a96;
+    --code-bg: #070305;
+    --code-text: #e5b0d0;
+    --button-text: #ffffff;
+    --button-hover: #972465;
+}
+
+/* ==========================================================================
+   GLOBAL RULES & RESET
+   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -13,67 +43,76 @@
 }
 
 body {
-    background-color: var(--oxblood);
-    color: var(--pure-white);
+    background-color: var(--main-bg);
+    color: var(--text-primary);
     height: 100vh;
     overflow: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 .app-container {
     display: flex;
     height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
+/* ==========================================================================
+   SIDEBAR & UTILITY CONTAINERS
+   ========================================================================== */
 .sidebar {
     width: 320px;
-    background-color: var(--space-indigo);
-    border-right: 2px solid var(--shadow-grey);
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-subtle);
     padding: 25px;
     display: flex;
     flex-direction: column;
     gap: 25px;
     height: 100%;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .logo-section h2 {
     font-size: 1.4rem;
     letter-spacing: 0.5px;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
-.logo-section span {
-    color: var(--pure-white);
-    opacity: 0.8;
+#themeToggleBtn:hover {
+    background-color: var(--border-subtle);
+    transform: scale(1.05);
 }
 
 .upload-box {
-    border: 2px dashed var(--pure-white);
+    border: 2px dashed var(--accent-plum);
     border-radius: 8px;
-    padding: 25px 15px;
+    padding: 0;
     text-align: center;
-    cursor: pointer;
-    background-color: var(--oxblood);
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    background-color: var(--card-bg);
+    transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.25s ease, opacity 0.2s ease;
     flex-shrink: 0;
 }
 
 .upload-box:hover {
-    transform: scale(1.02);
-    border-color: var(--pure-white);
+    transform: scale(1.01);
+}
+
+.custom-upload-btn {
+    padding: 25px 15px;
 }
 
 .custom-upload-btn span {
     display: block;
-    color: var(--pure-white);
+    color: var(--text-primary);
     font-weight: 600;
     margin-bottom: 5px;
 }
 
 .custom-upload-btn small {
-    color: var(--pure-white);
-    opacity: 0.6;
+    color: var(--text-secondary);
 }
 
-/* Sidebar Scrollable Wrapper */
 .sidebar-scrollable-content {
     flex: 1;
     overflow-y: auto;
@@ -89,90 +128,91 @@ body {
 }
 .sidebar-scrollable-content::-webkit-scrollbar-thumb,
 .columns-scroll-container::-webkit-scrollbar-thumb {
-    background: var(--shadow-grey);
+    background: var(--border-subtle);
     border-radius: 4px;
 }
 
+/* ==========================================================================
+   PANELS & DATA METRICS
+   ========================================================================== */
 .metrics-panel h3, .columns-panel h3 {
-    font-size: 0.9rem;
-    color: var(--pure-white);
+    font-size: 0.85rem;
+    color: var(--accent-plum);
     margin-bottom: 12px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.9;
+    letter-spacing: 1.2px;
+    font-weight: 700;
 }
 
 .metric-card {
-    background-color: var(--oxblood);
+    background-color: var(--card-bg);
     padding: 15px;
     border-radius: 6px;
-    border-left: 4px solid var(--shadow-grey);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--accent-plum);
     margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .metric-label {
     font-size: 0.9rem;
-    color: var(--pure-white);
-    opacity: 0.6;
+    color: var(--text-secondary);
 }
 
 .metric-value {
     font-weight: 700;
-    color: var(--pure-white);
+    color: var(--text-primary);
 }
 
-/* Columns Section Style */
 .columns-scroll-container {
     max-height: 220px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    background-color: var(--oxblood);
+    background-color: var(--card-bg);
     padding: 12px;
     border-radius: 6px;
-    border: 1px solid var(--shadow-grey);
+    border: 1px solid var(--border-subtle);
+    transition: background-color 0.25s ease;
 }
 
 .column-pill {
-    background-color: var(--space-indigo);
+    background-color: var(--sidebar-bg);
     padding: 8px 12px;
     border-radius: 4px;
-    border-left: 3px solid var(--pure-white);
+    border-left: 3px solid var(--border-subtle);
+    transition: background-color 0.25s ease;
 }
 
 .column-name {
     font-size: 0.85rem;
-    color: var(--pure-white);
+    color: var(--text-primary);
     font-family: monospace;
 }
 
 .no-columns-placeholder {
     font-size: 0.85rem;
-    color: var(--pure-white);
-    opacity: 0.4;
+    color: var(--text-secondary);
+    opacity: 0.6;
     font-style: italic;
     text-align: center;
     padding: 15px 0;
 }
 
-.app-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-}
-
-/* Main Workspace UI */
+/* ==========================================================================
+   WORKSPACE UI MAIN CANVAS
+   ========================================================================== */
 .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: var(--shadow-grey);
+    background-color: var(--main-bg);
     min-width: 0;
+    transition: background-color 0.25s ease;
 }
 
 .output-window {
@@ -186,67 +226,77 @@ body {
 
 .chart-container-wrapper {
     width: 100%;
-    background: var(--oxblood);
+    background: var(--card-bg);
     padding: 15px;
     border-radius: 6px;
+    border: 1px solid var(--border-subtle);
     margin-top: 15px;
     overflow: hidden;
+    transition: background-color 0.25s ease;
 }
 
 .system-message {
-    background-color: var(--space-indigo);
+    background-color: var(--card-bg);
+    color: var(--text-primary);
     padding: 15px 20px;
     border-radius: 8px;
-    border: 1px solid var(--oxblood);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--accent-plum);
     max-width: 80%;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .user-chat-bubble {
     text-align: right;
     margin-bottom: 15px;
-    color: var(--pure-white);
+    color: var(--text-primary);
 }
 
 .code-block-payload, .code-block-terminal {
-    padding: 10px;
-    border-radius: 4px;
+    padding: 12px;
+    border-radius: 6px;
     overflow-x: auto;
     font-family: monospace;
     margin-top: 6px;
     display: block;
+    background: var(--code-bg);
+    color: var(--code-text);
 }
-.code-block-payload { background: var(--oxblood); color: var(--pure-white); border: 1px solid var(--shadow-grey); }
-.code-block-terminal { background: var(--oxblood); color: var(--pure-white); border: 1px solid var(--space-indigo); }
+.code-block-payload { border: 1px solid var(--border-subtle); }
+.code-block-terminal { border: 1px solid var(--accent-plum); }
 
-/* Chat Input Bar */
+/* ==========================================================================
+   FOOTER CHAT CONTROLS
+   ========================================================================== */
 .input-container {
     padding: 25px;
-    background-color: var(--shadow-grey);
-    border-top: 2px solid var(--oxblood);
+    background-color: var(--main-bg);
+    border-top: 1px solid var(--border-subtle);
     display: flex;
     gap: 15px;
+    transition: background-color 0.25s ease, border-top-color 0.25s ease;
 }
 
 .input-container input {
     flex: 1;
-    background-color: var(--space-indigo);
-    border: 1px solid var(--shadow-grey);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-subtle);
     padding: 14px 20px;
     border-radius: 6px;
-    color: var(--pure-white);
+    color: var(--text-primary);
     font-size: 1rem;
     outline: none;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, background-color 0.25s ease;
 }
 
 .input-container input:focus {
-    border-color: var(--pure-white);
+    border-color: var(--accent-plum);
 }
 
 .input-container button {
-    background-color: var(--space-indigo);
-    color: var(--pure-white);
-    border: 1px solid var(--pure-white);
+    background-color: var(--accent-plum);
+    color: var(--button-text);
+    border: none;
     padding: 0 30px;
     border-radius: 6px;
     font-weight: 600;
@@ -255,7 +305,7 @@ body {
 }
 
 .input-container button:hover:not(:disabled) {
-    background-color: var(--shadow-grey);
+    background-color: var(--button-hover);
     transform: translateY(-1px);
 }
 
@@ -264,6 +314,9 @@ body {
     cursor: not-allowed;
 }
 
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
 .fade-in {
     animation: slideUpFade 0.4s ease forwards;
 }

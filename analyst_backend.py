@@ -8,6 +8,7 @@ from huggingface_hub import InferenceClient
 import re
 import io
 import sys
+from fastapi.encoders import jsonable_encoder
 
 load_dotenv()
 hf_token = os.getenv("HUGGINGFACE_TOKEN")
@@ -19,18 +20,17 @@ def Data_Cleaning(df):
 
     total_rows = int(df.shape[0])
     total_cols = int(df.shape[1])
-    df_shape = df.shape
-
+    df_shape = [int(total_rows), int(total_cols)]
 
     duplicate_count = int(df.duplicated().sum())
-    nulls_per_column = df.isnull().sum().to_dict()
+    nulls_per_column = {str(col): int(count) for col, count in df.isnull().sum().to_dict().items()}
     total_nulls = int(df.isnull().sum().sum())
 
     null_percentages = {}
     if total_rows > 0:
-        null_percentages = {col: round((count / total_rows) * 100, 2) for col, count in nulls_per_column.items()}
+        null_percentages = {str(col): round((count / total_rows) * 100, 2) for col, count in nulls_per_column.items()}
 
-    column_types = {col: str(dtype) for col, dtype in zip(df.columns, df.dtypes)}
+    column_types = {str(col): str(dtype) for col, dtype in zip(df.columns, df.dtypes)}
     report = {
         "shape": df_shape,
         "total_rows": total_rows,
@@ -43,7 +43,7 @@ def Data_Cleaning(df):
         "column_types": column_types
     }
 
-    return report
+    return jsonable_encoder(report)
 
 
 def Importing_Data(uploaded_file):
@@ -76,8 +76,9 @@ def critic_validate_code(user_query, generated_code, quality_report):
 
     CRITICAL INSPECTION RULES:
     1. Check if all column names used in the code are spelled EXACTLY as shown in the list above.
-    2. Ensure the code does NOT contain malicious commands like 'os.system', 'eval(input())', or file deletion.
-    3. Ensure the code actually attempts to solve the user's request.
+    2. STRING FILTERING RULE: If the code filters text values (like club names or player names), ensure it accounts for partial matches or exact dataset naming syntax. For example, use `.str.contains('Barcelona', case=False, na=False)` instead of `== 'Barcelona'` to prevent returning empty datasets (`nan`).
+    3. Ensure the code does NOT contain malicious commands like 'os.system', 'eval(input())', or file deletion.
+    4. Ensure the code actually attempts to solve the user's request.
 
     RESPONSE FORMAT:
     - If the code is perfect and safe, respond with ONLY the single word: "PASSED"
@@ -119,6 +120,7 @@ def ask_llama_to_generate_code(user_query, df, quality_report):
     - Total Rows: {quality_report['total_rows']}
     - Total Columns: {quality_report['total_columns']}
     - Matrix Shape: {quality_report['shape']}
+    - Complete Column List: {quality_report['columns']}
 
     DATASET SCHEMA & HEALTH METRICS:
     {formatted_schema}
@@ -127,12 +129,16 @@ def ask_llama_to_generate_code(user_query, df, quality_report):
 
     CRITICAL INSTRUCTIONS:
     1. Write ONLY executable Python code using pandas, numpy, plotly.express (as px), or matplotlib.pyplot (as plt).
-    2. BEFORE performing any calculations, analysis, or generating charts, you MUST write the code to clean the data first (e.g., handling the duplicates or missing values specified in the health metrics above if they affect the columns needed).
-    3. If the user explicitly asks to clean data, fix duplicates, or handle missing values, dynamically write the code to clean the dataset and reassign it back to 'df'.
-    4. If the user asks for a chart or visual diagram, you MUST save the final plotting object into a local variable explicitly named 'fig' (e.g., fig = px.bar(df, x='category', y='popularity')). Do NOT import streamlit, do NOT call st.plotly_chart, and do NOT use plt.show(). Return only the logic assigning the object to 'fig'.
+    2. BEFORE performing any calculations, analysis, or generating charts, you MUST clean character symbols like '€', 'M', or 'K' from data columns first. Always cast columns to string via `.astype(str)` before executing string accessors like `.str.replace()` or `.str.contains()` to avoid crashes on mixed types or floating points.
+    3. If the user explicitly asks to clean data, fix duplicates, or handle missing values, dynamically write the code to clean the dataset and reassign it back to 'df'. Always handle missing values gracefully checking data types before mutating columns.
+    4. If the user asks for a chart or visual diagram, you MUST save the final plotting object into a local variable explicitly named 'fig'. Do NOT use dark templates (e.g., do NOT set template='plotly_dark'). Keep the chart background transparent or default so it seamlessly inherits the web application's theme colors. Do NOT call fig.show(), do NOT call st.plotly_chart(), and do NOT use plt.show(). Just define 'fig' and let the script end naturally.
     5. Return nothing but the raw executable Python code wrapped inside a markdown block (```python ... ```). Do not include conversational text, pleasantries, or explanations.
-    6. In case if the user asks for any subjective type answer only then in just a simple python print statement give a brief answer to the user's question. If required you can provide visual graphs or pythonic code to support your answer based exactly on the subjective question.
+    6. If the user asks a subjective, strategic, or reasoning question, you MUST print a beautifully formatted, structured text report using explicit section dividers (---), bullet points (*), and clean key-value explanations within your print() statement execution block. Explain the strategic 'why' metrics cleanly based exactly on the data instead of returning raw unformatted objects.
     7. Your answer at all times must be in a python code.
+    8. EXPLORATORY DATA ANALYSIS (EDA) RULE: If the user explicitly asks for 'EDA', 'perform EDA', or 'exploratory data analysis', you must perform a structured analysis.
+       - Textual Summary: Compute statistical metrics (like .describe(), .mean(), or .median()) ONLY on columns that are strictly numeric by filtering via `df.select_dtypes(include=[np.number])`. Print these key statistical insights cleanly.
+       - Visual Chart: Create an optimized overview plot (e.g., a distribution histogram of a key numeric metric, or a bar chart of top categorical distributions) assigned directly to the 'fig' object variable. 
+       - Avoid Errors: Do NOT attempt correlation heatmaps or mathematical reductions on mixed/string columns. Do NOT import libraries other than pandas, numpy, plotly.express (px), or matplotlib.pyplot (plt).
     """
 
     messages = [
@@ -144,7 +150,7 @@ def ask_llama_to_generate_code(user_query, df, quality_report):
         response = client.chat_completion(
             model=model_name,
             messages=messages,
-            max_tokens=600,
+            max_tokens=1000,
             temperature=0.1
         )
         return response.choices[0].message.content.strip()
