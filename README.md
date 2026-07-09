@@ -142,4 +142,4 @@ Issues and pull requests are welcome. If you find a bug in the agent prompts, th
 
 ## License
 
-Add your license of choice here (e.g. MIT).
+MIT — see [LICENSE](LICENSE).
