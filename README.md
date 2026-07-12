@@ -2,6 +2,9 @@
 
 Upload a spreadsheet, ask a question in plain English, and get back a chart, an answer, or a cleaned dataset. Under the hood, a small pipeline of two LLM agents writes the analysis code, checks it for mistakes, and only then runs it.
 
+<img width="1918" height="965" alt="Screenshot 2026-07-12 183653" src="https://github.com/user-attachments/assets/6a8a03fa-8a46-4a26-bb23-64d207143732" />
+
+
 ## What it does
 
 - Upload a CSV, Excel, or JSON file
