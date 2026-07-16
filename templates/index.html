@@ -2,246 +2,82 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <title>Smart Data Analyst</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Data Analyst — Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="/static/style.css">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
 </head>
 <body>
+
     <div class="app-container">
-        <aside class="sidebar">
-            <div class="logo-section" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <h2>Smart Data Analyst</h2>
-                <button id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; transition: background-color 0.2s ease, transform 0.2s ease;">
-                    <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary); transition: transform 0.2s ease;"></svg>
-                </button>
+
+        <aside class="sidebar" id="appSidebar">
+            <div class="logo-section">
+                <h2>SmartData<span>Analyst</span></h2>
+                <div class="utility-controls">
+                    <button class="icon-btn" id="themeToggle" title="Toggle Mode">
+                        <i data-lucide="sun"></i>
+                    </button>
+                    <button class="icon-btn" id="collapseSidebarBtn" title="Hide Sidebar">
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="upload-box" id="dropZone">
-                <label for="file-upload" class="custom-upload-btn" style="width: 100%; height: 100%; display: block; cursor: pointer;">
-                    <span>Drop your dataset here</span>
-                    <small style="display: block; margin-top: 4px;">Supports CSV, XLSX, JSON</small>
-                    <input type="file" id="file-upload" accept=".csv, .xlsx, .xls, .json" style="display:none;">
-                </label>
+                <i data-lucide="cloud-lightning" size="28"></i>
+                <span>Drop your dataset here</span>
+                <small>Supports CSV, XLSX, JSON</small>
+                <input type="file" id="hiddenFileInput" style="display: none;" accept=".csv,.xlsx,.json">
             </div>
 
-            <div class="sidebar-scrollable-content">
-                <div class="metrics-panel" id="metricsPanel">
-                    <h3>Dataset Health Profile</h3>
-                    <div class="metric-card fade-in">
-                        <span class="metric-label">Dimensions</span>
-                        <span class="metric-value" id="metaShape">- × -</span>
-                    </div>
-                    <div class="metric-card fade-in">
-                        <span class="metric-label">Duplicate Rows</span>
-                        <span class="metric-value badge-alert" id="metaDuplicates">0</span>
-                    </div>
-                    <div class="metric-card fade-in">
-                        <span class="metric-label">Null Cells</span>
-                        <span class="metric-value badge-warning" id="metaNulls">0</span>
+            <div class="sidebar-scroll-wrapper">
+                <div>
+                    <div class="panel-title">Dataset Profile</div>
+                    <div id="metricsPanel">
+                        <div class="metric-card"><span class="metric-label">Dimensions</span><span class="metric-value" id="metaDim">- × -</span></div>
+                        <div class="metric-card"><span class="metric-label">Duplicate Rows</span><span class="metric-value" id="metaDup">0</span></div>
+                        <div class="metric-card"><span class="metric-label">Null Cells</span><span class="metric-value" id="metaNull">0</span></div>
                     </div>
                 </div>
 
-                <div class="columns-panel" id="columnsPanel">
-                    <h3>Detected Columns</h3>
-                    <div class="columns-scroll-container" id="columnContainer">
-                        <div class="no-columns-placeholder">No dataset loaded yet</div>
+                <div>
+                    <div class="panel-title">Detected Target Columns</div>
+                    <div class="columns-container" id="columnsWrapper">
+                        <span class="placeholder-text">No active ledger parsed yet.</span>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <main class="main-content">
-            <div class="output-window" id="outputWindow">
-                <div class="system-message fade-in">
-                    <p>Welcome! Upload a file on the left to initialize the Coder-Critic environment loop.</p>
+        <main class="main-workspace">
+            <button class="icon-btn sidebar-trigger" id="expandSidebarBtn" style="display: none;" title="Show Sidebar">
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="output-viewport" id="chatViewport">
+                <div class="chat-row agent-mode">
+                    <div class="bubble">
+                        Welcome back. Upload a raw data pipeline to initialize the secure operational evaluation loop.
+                    </div>
                 </div>
             </div>
 
-            <div class="input-container">
-                <input type="text" id="userQuery" placeholder="Ask your agent to clean data, extract statistics, or generate charts..." disabled>
-                <button id="sendBtn" disabled>Run Query</button>
+            <div class="input-console-wrapper">
+                <div class="input-box-container">
+                    <i data-lucide="terminal" size="18" style="color: var(--text-muted)"></i>
+                    <input type="text" id="userQueryInput" placeholder="Ask your agent to clean data, extract statistics, or generate charts...">
+                    <button id="sendQueryBtn" disabled>
+                        <span>Run Query</span>
+                        <i data-lucide="play" size="14"></i>
+                    </button>
+                </div>
             </div>
         </main>
     </div>
 
-    <script>
-        // --- LIVE MULTI-THEME ENGINE (MINIMALIST SVG) ---
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const themeIcon = document.getElementById('themeIcon');
-        const currentTheme = localStorage.getItem('theme') || 'dark';
-
-        const sunPath = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
-        const moonPath = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
-
-        document.documentElement.setAttribute('data-theme', currentTheme);
-        themeIcon.innerHTML = currentTheme === 'dark' ? sunPath : moonPath;
-
-        themeToggleBtn.addEventListener('click', () => {
-            let activeTheme = document.documentElement.getAttribute('data-theme');
-            let targetTheme = activeTheme === 'dark' ? 'light' : 'dark';
-
-            document.documentElement.setAttribute('data-theme', targetTheme);
-            localStorage.setItem('theme', targetTheme);
-
-            themeIcon.style.transform = 'rotate(45deg)';
-            setTimeout(() => {
-                themeIcon.innerHTML = targetTheme === 'dark' ? sunPath : moonPath;
-                themeIcon.style.transform = 'rotate(0deg)';
-            }, 100);
-        });
-
-        // --- CORE APPLICATION LOGIC ---
-        const fileUpload = document.getElementById('file-upload');
-        const userQuery = document.getElementById('userQuery');
-        const sendBtn = document.getElementById('sendBtn');
-        const outputWindow = document.getElementById('outputWindow');
-        const columnContainer = document.getElementById('columnContainer');
-        const dropZone = document.getElementById('dropZone');
-
-        // --- ROBUST DRAG & DROP INTERACTION HANDLERS ---
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.style.borderColor = 'var(--text-primary)';
-                dropZone.style.opacity = '0.8';
-            }, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.style.borderColor = 'var(--accent-plum)';
-                dropZone.style.opacity = '1';
-            }, false);
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-
-            if (files.length > 0) {
-                fileUpload.files = files;
-                fileUpload.dispatchEvent(new Event('change'));
-            }
-        });
-
-        function updateMetricsPanel(metrics) {
-            document.getElementById('metaShape').innerText = `${metrics.total_rows} × ${metrics.total_columns}`;
-            document.getElementById('metaDuplicates').innerText = metrics.duplicate_count;
-            document.getElementById('metaNulls').innerText = metrics.total_nulls;
-
-            if (metrics.columns && metrics.columns.length > 0) {
-                columnContainer.innerHTML = metrics.columns.map(col => `
-                    <div class="column-pill fade-in">
-                        <span class="column-name">${col}</span>
-                    </div>
-                `).join('');
-            } else {
-                columnContainer.innerHTML = `<div class="no-columns-placeholder">No columns found</div>`;
-            }
-        }
-
-        fileUpload.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            outputWindow.innerHTML += `<div class="system-message fade-in"><p>Processing and profiling your dataset...</p></div>`;
-
-            try {
-                const response = await fetch('/upload', { method: 'POST', body: formData });
-                const data = await response.json();
-
-                if (data.status === 'Success') {
-                    updateMetricsPanel(data.metrics);
-                    userQuery.disabled = false;
-                    sendBtn.disabled = false;
-                    userQuery.placeholder = "Ask something...";
-                    outputWindow.innerHTML += `<div class="system-message fade-in"><p>Environment Ready! Dataset structure parsed successfully.</p></div>`;
-                } else {
-                    outputWindow.innerHTML += `<div class="system-message fade-in"><p>Error: ${data.message}</p></div>`;
-                }
-            } catch (err) {
-                outputWindow.innerHTML += `<div class="system-message fade-in"><p>Error connecting to backend ecosystem.</p></div>`;
-            }
-            outputWindow.scrollTop = outputWindow.scrollHeight;
-        });
-
-        sendBtn.addEventListener('click', async () => {
-            const query = userQuery.value.trim();
-            if (!query) return;
-
-            outputWindow.innerHTML += `<div class="user-chat-bubble fade-in"><p><strong>You:</strong> ${query}</p></div>`;
-            userQuery.value = '';
-
-            const formData = new URLSearchParams();
-            formData.append('query', query);
-
-            outputWindow.innerHTML += `<div class="system-message fade-in"><p>Thought Process: Thinking and validating execution path...</p></div>`;
-            outputWindow.scrollTop = outputWindow.scrollHeight;
-
-            try {
-                const response = await fetch('/analyze', { method: 'POST', body: formData });
-                const data = await response.json();
-
-                if (data.status === 'Success') {
-                    updateMetricsPanel(data.metrics);
-
-                    const chartDivId = `chart-${Date.now()}`;
-                    const terminalConsoleOutput = data.output_text.trim() ? data.output_text : "Executed cleanly (No text printed).";
-
-                    outputWindow.innerHTML += `
-                        <div class="system-message fade-in" style="max-width: 90%;">
-                            <p><strong>Agent Response:</strong> Query executed cleanly in ${data.iterations} model iterations.</p>
-
-                            <div class="main-terminal-response" style="margin-top: 12px;">
-                                <small style="opacity:0.7; font-weight:600; display:block; margin-bottom:4px;">Terminal Console Output:</small>
-                                <pre class="code-block-terminal" style="white-space: pre-wrap;">${terminalConsoleOutput}</pre>
-                            </div>
-
-                            <details style="margin-top: 15px; cursor: pointer;">
-                                <summary style="font-size: 0.85rem; opacity: 0.7; outline: none;">
-                                    ▶ View Generated Sandbox Payload Code
-                                </summary>
-                                <div style="margin-top: 8px;">
-                                    <pre class="code-block-payload">${data.code_run}</pre>
-                                </div>
-                            </details>
-
-                            ${data.has_chart ? `<div class="chart-container-wrapper"><div id="${chartDivId}"></div></div>` : ''}
-                        </div>`;
-
-                    if (data.has_chart) {
-                        setTimeout(() => {
-                            const chartSpec = JSON.parse(data.chart_data);
-
-                            chartSpec.layout = chartSpec.layout || {};
-                            chartSpec.layout.autosize = true;
-                            chartSpec.layout.width = null;
-                            chartSpec.layout.height = 400;
-
-                            const activeTheme = document.documentElement.getAttribute('data-theme');
-                            chartSpec.layout.paper_bgcolor = 'rgba(0,0,0,0)';
-                            chartSpec.layout.plot_bgcolor = 'rgba(0,0,0,0)';
-                            chartSpec.layout.font = {
-                                color: activeTheme === 'dark' ? '#f7f1f5' : '#1a1116'
-                            };
-
-                            Plotly.newPlot(chartDivId, chartSpec.data, chartSpec.layout, {responsive: true});
-                        }, 50);
-                    }
-                } else {
-                    outputWindow.innerHTML += `<div class="system-message fade-in"><p>Error: ${data.message}</p></div>`;
-                }
-            } catch (err) {
-                outputWindow.innerHTML += `<div class="system-message fade-in"><p>Error processing query.</p></div>`;
-            }
-            outputWindow.scrollTop = outputWindow.scrollHeight;
-        });
-    </script>
+    <script src="/static/script.js"></script>
 </body>
 </html>
